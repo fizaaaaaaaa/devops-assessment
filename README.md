@@ -113,9 +113,4 @@ docker compose down -v       # stops containers AND wipes Postgres/LocalStack da
    - Opened/downloaded the uploaded file successfully (exercises the presigned URL flow).
    - Deleted the file, confirmed it disappeared from the list and `/api/health/full` still reports healthy.
 5. Ran `docker compose restart postgres backend` and confirmed previously created items/files were still present afterward, verifying the named volume persists data across restarts.
-
-## Troubleshooting
-- **Frontend container stuck in `Restarting`, logs show `nginx: [emerg] unknown directive ...`**: `frontend/nginx.conf` has malformed content (e.g. a stray line). Recreate the file with clean content and rebuild: `docker compose build frontend && docker compose up -d frontend`.
-- **`/api/health/db` or `/api/health/s3` report disconnected after only some containers were restarted**: the backend is holding stale connections to a dependency container that got recreated. Bring the whole stack down and up together: `docker compose down && docker compose up -d`.
-- **Changes to `.env` don't seem to take effect**: environment variables consumed at container *runtime* (DB/S3 credentials) just need `docker compose up -d` again. Frontend build-time variables (like `VITE_API_BASE_URL`, used starting Level 3) require a rebuild (`docker compose build frontend`), not just a restart, since Vite bakes them into the static bundle at build time.
 - **Port already in use on `5173` or `8000`**: another process on the host is using that port; stop it or change the published port mapping in `docker-compose.yml`.
